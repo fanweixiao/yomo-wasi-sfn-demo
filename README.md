@@ -7,7 +7,7 @@ This demo shows:
 - parse JSON while [tinygo's limited support for reflection](https://wazero.io/languages/tinygo/#unsupported-standard-libraries).
 
 ```bash
-$yomo build --target wasm -m go.mod app.go
+$ yomo build --target wasm -m go.mod app.go
 
-$yomo dev sfn.wasm
+$ yomo dev sfn.wasm
 ```
