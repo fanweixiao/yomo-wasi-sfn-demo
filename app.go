@@ -1,8 +1,9 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
-	"time"
+	"math"
 
 	"github.com/tidwall/gjson"
 	"github.com/yomorun/yomo/core/frame"
@@ -14,19 +15,26 @@ type NoiseSensorData struct {
 	From  string  `json:"from"`  // Source IP
 }
 
+var sum float64
+var count int
+
 // Handler will handle the raw data
 func Handler(data []byte) (frame.Tag, []byte) {
 	fmt.Printf("sfn received %d bytes: %s\n", len(data), string(data))
-	level := gjson.Get(string(data), "noise")
-	timestamp := gjson.Get(string(data), "time")
+	// get noise field from json string
+	noiseLevel := gjson.Get(string(data), "noise").Float()
 
-	now := time.Now().UnixNano() / int64(time.Millisecond)
-	fmt.Println(now)
-	fmt.Println(timestamp.Int())
+	sum += noiseLevel
+	count++
 
-	fmt.Printf("data: %v, ⚡️: %dms\n", level.String(), now-timestamp.Int())
+	// calculate average noise level
+	avg := sum / float64(count)
+	fmt.Printf("\t⚡️avg=%f\n", avg)
 
-	return frame.Tag(0x34), nil
+	// send result to next processor with data tag=0x34
+	var buf [8]byte
+	binary.BigEndian.PutUint64(buf[:], math.Float64bits(avg))
+	return frame.Tag(0x34), buf[:]
 }
 
 func DataTags() []frame.Tag {

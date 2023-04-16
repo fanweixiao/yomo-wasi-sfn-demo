@@ -11,7 +11,7 @@ This demo shows:
 $ curl -fsSL https://get.yomo.run | sh
 
 # Build
-$ yomo build --target wasm -m go.mod app.go
+$ yomo build --target wasm app.go
 
 # Test Run
 $ yomo dev sfn.wasm
